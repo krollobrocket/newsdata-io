@@ -1,0 +1,18 @@
+.news-wrapper {
+    width: 100%;
+}
+.news-wrapper article {
+    padding: 10px;
+    margin-bottom: 10px;
+}
+.news-wrapper article h5 {
+    padding-bottom: 10px;
+}
+.news-wrapper article img {
+    float: left;
+    padding-right: 10px;
+}
+.news-wrapper article a {
+    display: block;
+    text-align: right;
+}
