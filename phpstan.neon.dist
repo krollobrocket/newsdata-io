@@ -1,0 +1,13 @@
+parameters:
+    ignoreErrors:
+        -
+            identifier: missingType.iterableValue
+
+        -
+            message: "#Variable \\$this might not be defined.*#"
+            path: src/templates/settings.php
+
+
+    level: max
+    paths:
+        - src

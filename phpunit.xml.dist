@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd" backupGlobals="false" colors="true" bootstrap="vendor/autoload.php">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <exclude>
+      <directory suffix=".php">src/templates</directory>
+    </exclude>
+    <report>
+      <clover outputFile="coverage/clover.xml" />
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="unit">
+      <directory>tests/unit</directory>
+    </testsuite>
+    <testsuite name="e2e">
+      <directory>tests/e2e</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

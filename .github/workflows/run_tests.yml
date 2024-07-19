@@ -1,0 +1,96 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+
+      - name: Validate composer.json and composer.lock
+        working-directory: .
+        run: composer validate --strict
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: ./vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        working-directory: .
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run Unit test suite
+        working-directory: .
+        run: export API_TOKEN=${{ secrets.FREE_API_TOKEN }} && ./vendor/bin/phpunit --testsuite unit --do-not-cache-result --no-coverage
+
+      - name: Run E2E test suite
+        working-directory: .
+        run: export API_TOKEN=${{ secrets.FREE_API_TOKEN }} && ./vendor/bin/phpunit --testsuite e2e --do-not-cache-result --no-coverage
+
+      - name: Run phpstan
+        working-directory: .
+        run: ./vendor/bin/phpstan
+
+      - name: Run psalm
+        working-directory: .
+        run: ./vendor/bin/psalm
+
+  coverage:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v4
+        with:
+          path: ./vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        working-directory: .
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run code coverage
+        working-directory: .
+        run: php -d xdebug.mode=coverage ./vendor/bin/phpunit --testsuite unit --do-not-cache-result --coverage-clover clover.xml
+
+      - name: Make code coverage badge
+        uses: timkrase/phpunit-coverage-badge@v1.2.1
+        with:
+          coverage_badge_path: output/coverage.svg
+          push_badge: false
+
+      - name: Git push to image-data branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: ./output
+          publish_branch: badges
+          github_token: ${{ secrets.PRIVATE_TOKEN }}
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
