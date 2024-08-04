@@ -1,7 +1,0 @@
-{
-  "status": "error",
-  "results": {
-    "message": "Ensure that you have passed the correct parameters. For more information, please refer to our documentation at: https://newsdata.io/documentation/",
-    "code": "UnsupportedParameter"
-  }
-}
